@@ -3,23 +3,24 @@
  */
 
 require('../node_modules/bootstrap/dist/css/bootstrap.css');
+require('../styles/style.css');
 
 var React = require('react'),
     ReactDom = require('react-dom'),
-    Button = require('react-bootstrap').button;
-    HeadBar = require('head.jsx');
-    Content = require('content.jsx');
+    HeadLayout = require('./layout.jsx').HeadLayout,
+    MainLayout = require('./layout.jsx').MainLayout,
+    Grid = require('react-bootstrap').Grid;
 
 var App = React.createClass({
     render: function () {
         return (
-            <div>
-                <HeadBar ></HeadBar>
-                <Content ></Content>
-            </div>
+            <Grid>
+                <HeadLayout/>
+                <MainLayout/>
+            </Grid>
         )
     }
-})
+});
 
 ReactDom.render(
     <App/>,

@@ -19,8 +19,9 @@ gulp.task('webpack',function () {
 
 gulp.task('dev-serve', ['browser-sync'],function () {
     gulp.watch('components/*.**',['webpack']);
+    gulp.watch('styles/*.**',['webpack']);
     gulp.watch('dist/*.**',function(){
-        browserSync.reload;
+        browserSync.reload();
         console.log('watching ...');
     });
 });
