@@ -3,10 +3,9 @@
  */
 
 var webpack = require('webpack');
-
 module.exports = {
     cache: true,
-    entry: './components/main.jsx',
+    entry: './src/components/main.jsx',
     output: {
         filename: 'entry.js',
         path: __dirname + '/dist/'
@@ -14,7 +13,7 @@ module.exports = {
     module: {
         loaders: [
             {test: /bootstrap\/js\//, loader: 'imports?jQuery=jquery'},
-            {test: /\.js$/, exclude: './node_modules/', loader: 'babel-loader'},
+            {test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'},
             {test: /\.jsx$/, loader: 'jsx-loader?harmony'},
             {test: /\.css$/, loader: 'style-loader!css-loader'},
 

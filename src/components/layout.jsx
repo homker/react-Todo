@@ -1,11 +1,5 @@
-/**
- * 中心核心区域布局
- * @type {*|exports|module.exports}
- */
-
-require('../styles/style.css');
-
 var React = require('react'),
+    Reflux = require('reflux'),
     MainDisplayBox = require('./maindisplaybox.jsx'),
     Row = require('react-bootstrap').Row,
     Col = require('react-bootstrap').Col,
@@ -17,20 +11,21 @@ var React = require('react'),
     NavBrand = require('react-bootstrap').NavBrand,
     Accordion = require('react-bootstrap').Accordion,
     Panel = require('react-bootstrap').Panel,
-    ListGoup = require('react-bootstrap').ListGroup,
-    ListGroupItem = require('react-bootstrap').ListGroupItem;
+    ListGroup = require('react-bootstrap').ListGroup,
+    ListGroupItem = require('react-bootstrap').ListGroupItem,
+    Button = require('./DragButton'),
+    DragDropContext = require('react-dnd').DragDropContext,
+    HTML5BackEnd = require('react-dnd-html5-backend'),
+    Actions = require('../action/actions'),
+    Stroe = require('../store/stores');
 
+/**
+ * 中心核心区域布局
+ * @type {*|exports|module.exports}
+ */
 
-var ContentLayout = React.createClass({
-    render: function () {
-        return (
-            <Row className="mainDisPlay">
-                <Col xs={4} md={2} className="leftToolBox">{'hello'}</Col>
-                <Col xs={14} md={10} className="mainDisPlay">{'word'}</Col>
-            </Row>
-        )
-    }
-});
+require('../styles/style.css');
+
 
 var HeadLayout = React.createClass({
     render: function () {
@@ -55,40 +50,70 @@ var HeadLayout = React.createClass({
 
 
 var LeftMenu = React.createClass({
+
     render: function () {
         return (
             <Accordion>
                 <Panel header="Collapsible Group Item #1" eventKey="1">
                     <ListGroup>
                         <ListGroupItem>
-                            this is a button
+                            <Button name="Button">
+                                this is a button;
+                            </Button>
                         </ListGroupItem>
                     </ListGroup>
                 </Panel>
                 <Panel header="Collapsible Group Item #2" eventKey="2">
-                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3
-                    wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum
-                    eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla
-                    assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt
-                    sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer
-                    farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus
-                    labore sustainable VHS.
+                    <ListGroup>
+                        <ListGroupItem>
+                            this is a button
+                        </ListGroupItem>
+                    </ListGroup>
                 </Panel>
                 <Panel header="Collapsible Group Item #3" eventKey="3">
-                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3
-                    wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum
-                    eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla
-                    assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt
-                    sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer
-                    farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus
-                    labore sustainable VHS.
+                    <ListGroup>
+                        <ListGroupItem>
+                            this is a button
+                        </ListGroupItem>
+                    </ListGroup>
                 </Panel>
             </Accordion>
         )
     }
 });
+var ContentLayout = React.createClass({
+
+        mixin:[Reflux.connect(Stroe)],
+
+        getInitialState: function () {
+            return {}
+        },
+        handleDrop: function () {
+            console.log('handle drop');
+            Actions.dropHandle();
+        },
+        componentDidMount:function(){
+            console.log("get it");
+        },
+        render: function () {
+            var DropHandle = this.handleDrop;
+            return (
+                <Row className="mainDisPlay">
+                    <Col xs={4} md={2} className="leftToolBox">
+                        <LeftMenu></LeftMenu>
+                    </Col>
+                    <Col xs={14} md={10} className="mainDisPlay">
+                        <MainDisplayBox
+                            onDrop={DropHandle}
+                            />
+                    </Col>
+                </Row>
+            )
+        }
+    })
+    ;
 
 module.exports = {
-    MainLayout: ContentLayout,
+    MainLayout: DragDropContext(HTML5BackEnd)(ContentLayout),
     HeadLayout: HeadLayout
 };

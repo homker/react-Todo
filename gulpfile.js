@@ -12,14 +12,13 @@ gulp.task('browser-sync',['webpack'], function () {
 });
 
 gulp.task('webpack',function () {
-    return gulp.src('./components/*.**')
+    return gulp.src('./src/*/*.**')
         .pipe(webpack(webpackConfig))
         .pipe(gulp.dest('./dist'))
 });
 
 gulp.task('dev-serve', ['browser-sync'],function () {
-    gulp.watch('components/*.**',['webpack']);
-    gulp.watch('styles/*.**',['webpack']);
+    gulp.watch('src/*/**.*',['webpack']);
     gulp.watch('dist/*.**',function(){
         browserSync.reload();
         console.log('watching ...');

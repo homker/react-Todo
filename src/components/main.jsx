@@ -2,16 +2,19 @@
  * Created by homker on 15/10/23.
  */
 
-require('../node_modules/bootstrap/dist/css/bootstrap.css');
+require('../../node_modules/bootstrap/dist/css/bootstrap.css');
 require('../styles/style.css');
 
 var React = require('react'),
     ReactDom = require('react-dom'),
+    Reflux = require('reflux'),
+    Store = require('../store/stores'),
     HeadLayout = require('./layout.jsx').HeadLayout,
     MainLayout = require('./layout.jsx').MainLayout,
     Grid = require('react-bootstrap').Grid;
 
 var App = React.createClass({
+
     render: function () {
         return (
             <Grid>
