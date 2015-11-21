@@ -8,60 +8,56 @@ var React = require('react'),
     Row = require('react-bootstrap').Row,
     Col = require('react-bootstrap').Col,
     Grid = require('react-bootstrap').Grid,
-    DragTarget = require('react-dnd').DropTarget;
+    DragTarget = require('react-dnd').DropTarget,
+    Label = require('react-bootstrap').Label,
+    Actions = require('../action/actions');
 
 
 var Type = {
-    Button:"button"
+    Button: "button"
 };
 
 var boxTarget = {
-    drop:function(props,monitor,components){
-        console.log(monitor.didDrop());
-        var hasChild = monitor.didDrop();
-        props.onDrop(monitor.getItem());
-        components.setState({
-            hasDropped:true,
-            hasDroppedOnChild:hasChild
-        })
+    drop: function (props, monitor, components) {
+        Actions.boxTargetDrop(props, monitor, components);
     }
 };
 
-function collect(connect,monitor){
+function collect(connect, monitor) {
     return {
-        child:monitor.getItem(),
-        connectDropTarget:connect.dropTarget(),
-        isOver:monitor.isOver(),
-        isOverCurrent:monitor.isOver({
-            shallow:true
-        })
+        child: monitor.getItem() || monitor.getDropResult(),
+        connectDropTarget: connect.dropTarget(),
+        isOver: monitor.isOver()
     }
 }
 
 
 var MainDisplayBox = React.createClass({
 
-    propTypes:{
+    propTypes: {
         connectDropTarget: PropTypes.func.isRequired,
         isOver: PropTypes.bool.isRequired,
-        isOverCurrent: PropTypes.bool.isRequired,
         greedy: PropTypes.bool,
         children: PropTypes.node
     },
+    componentWillMount: function () {
 
+    },
+    shouldComponentUpdate: function (nextProps, nextState) {
+        return !this.props.child;
+    },
     render: function () {
         var children = this.props.child,
             connectTarget = this.props.connectDropTarget;
-        console.log(this.props);
+        var Component = children && children.name ? eval(children.name) : Label;
         return connectTarget(
             <div>
-                {
-                    (children&&children.name)?
-                    '<'+children.name+'>'+'</'+ children.name+'>' :"null"
+                {children && children.name ?
+                    <Component>{children.name}</Component> : null
                 }
             </div>
         );
     }
 });
 
-module.exports = DragTarget(Type.Button,boxTarget,collect)(MainDisplayBox);
+module.exports = DragTarget(Type.Button, boxTarget, collect)(MainDisplayBox);

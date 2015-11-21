@@ -17,7 +17,8 @@ var React = require('react'),
     DragDropContext = require('react-dnd').DragDropContext,
     HTML5BackEnd = require('react-dnd-html5-backend'),
     Actions = require('../action/actions'),
-    Stroe = require('../store/stores');
+    Stroe = require('../store/stores'),
+    LeftMenu = require('./lefttoolbar.jsx');
 
 /**
  * 中心核心区域布局
@@ -49,41 +50,10 @@ var HeadLayout = React.createClass({
 });
 
 
-var LeftMenu = React.createClass({
 
-    render: function () {
-        return (
-            <Accordion>
-                <Panel header="Collapsible Group Item #1" eventKey="1">
-                    <ListGroup>
-                        <ListGroupItem>
-                            <Button name="Button">
-                                this is a button;
-                            </Button>
-                        </ListGroupItem>
-                    </ListGroup>
-                </Panel>
-                <Panel header="Collapsible Group Item #2" eventKey="2">
-                    <ListGroup>
-                        <ListGroupItem>
-                            this is a button
-                        </ListGroupItem>
-                    </ListGroup>
-                </Panel>
-                <Panel header="Collapsible Group Item #3" eventKey="3">
-                    <ListGroup>
-                        <ListGroupItem>
-                            this is a button
-                        </ListGroupItem>
-                    </ListGroup>
-                </Panel>
-            </Accordion>
-        )
-    }
-});
 var ContentLayout = React.createClass({
 
-        mixin:[Reflux.connect(Stroe)],
+        mixin: [Reflux.connect(Stroe)],
 
         getInitialState: function () {
             return {}
@@ -92,19 +62,15 @@ var ContentLayout = React.createClass({
             console.log('handle drop');
             Actions.dropHandle();
         },
-        componentDidMount:function(){
-            console.log("get it");
-        },
         render: function () {
-            var DropHandle = this.handleDrop;
             return (
                 <Row className="mainDisPlay">
                     <Col xs={4} md={2} className="leftToolBox">
-                        <LeftMenu></LeftMenu>
+                        <LeftMenu/>
                     </Col>
                     <Col xs={14} md={10} className="mainDisPlay">
                         <MainDisplayBox
-                            onDrop={DropHandle}
+                            onDrop={this.handleDrop}
                             />
                     </Col>
                 </Row>

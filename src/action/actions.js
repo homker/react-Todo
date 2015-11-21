@@ -6,7 +6,10 @@
 var Reflux = require('reflux');
 
 var Actions = Reflux.createActions([
-    'dropHandle'  //拖动事件
+    'dropHandle',  //拖动事件
+    'sourceBeginDrop',
+    'sourceEndDrop',
+    'boxTargetDrop'
 ]);
 
 module.exports = Actions;

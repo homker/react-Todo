@@ -21463,6 +21463,16 @@
 	    listenables: [Actions],
 	    ondropHandle: function ondropHandle() {
 	        console.log('do it');
+	    },
+	    onsourceBeginDrop: function onsourceBeginDrop(props, monitor, component) {},
+	    onsourceEndDrop: function onsourceEndDrop(props, monitor, component) {},
+	    onboxTargetDrop: function onboxTargetDrop(props, monitor, components) {
+	        var hasChild = monitor.didDrop();
+	        props.onDrop(monitor.getItem());
+	        components.setState({
+	            hasDropped: true,
+	            hasDroppedOnChild: hasChild
+	        });
 	    }
 	});
 
@@ -21481,8 +21491,8 @@
 
 	var Reflux = __webpack_require__(169);
 
-	var Actions = Reflux.createActions(['dropHandle' //拖动事件
-	]);
+	var Actions = Reflux.createActions(['dropHandle', //拖动事件
+	'sourceBeginDrop', 'sourceEndDrop', 'boxTargetDrop']);
 
 	module.exports = Actions;
 
@@ -21509,7 +21519,8 @@
 	    DragDropContext = __webpack_require__(430).DragDropContext,
 	    HTML5BackEnd = __webpack_require__(509),
 	    Actions = __webpack_require__(189),
-	    Stroe = __webpack_require__(188);
+	    Stroe = __webpack_require__(188),
+	    LeftMenu = __webpack_require__(564);
 
 	/**
 	 * 中心核心区域布局
@@ -21541,41 +21552,10 @@
 	});
 
 
-	var LeftMenu = React.createClass({displayName: "LeftMenu",
 
-	    render: function () {
-	        return (
-	            React.createElement(Accordion, null, 
-	                React.createElement(Panel, {header: "Collapsible Group Item #1", eventKey: "1"}, 
-	                    React.createElement(ListGroup, null, 
-	                        React.createElement(ListGroupItem, null, 
-	                            React.createElement(Button, {name: "Button"}, 
-	                                "this is a button;"
-	                            )
-	                        )
-	                    )
-	                ), 
-	                React.createElement(Panel, {header: "Collapsible Group Item #2", eventKey: "2"}, 
-	                    React.createElement(ListGroup, null, 
-	                        React.createElement(ListGroupItem, null, 
-	                            "this is a button"
-	                        )
-	                    )
-	                ), 
-	                React.createElement(Panel, {header: "Collapsible Group Item #3", eventKey: "3"}, 
-	                    React.createElement(ListGroup, null, 
-	                        React.createElement(ListGroupItem, null, 
-	                            "this is a button"
-	                        )
-	                    )
-	                )
-	            )
-	        )
-	    }
-	});
 	var ContentLayout = React.createClass({displayName: "ContentLayout",
 
-	        mixin:[Reflux.connect(Stroe)],
+	        mixin: [Reflux.connect(Stroe)],
 
 	        getInitialState: function () {
 	            return {}
@@ -21584,11 +21564,7 @@
 	            console.log('handle drop');
 	            Actions.dropHandle();
 	        },
-	        componentDidMount:function(){
-	            console.log("get it");
-	        },
 	        render: function () {
-	            var DropHandle = this.handleDrop;
 	            return (
 	                React.createElement(Row, {className: "mainDisPlay"}, 
 	                    React.createElement(Col, {xs: 4, md: 2, className: "leftToolBox"}, 
@@ -21596,7 +21572,7 @@
 	                    ), 
 	                    React.createElement(Col, {xs: 14, md: 10, className: "mainDisPlay"}, 
 	                        React.createElement(MainDisplayBox, {
-	                            onDrop: DropHandle}
+	                            onDrop: this.handleDrop}
 	                            )
 	                    )
 	                )
@@ -21625,63 +21601,59 @@
 	    Row = __webpack_require__(192).Row,
 	    Col = __webpack_require__(192).Col,
 	    Grid = __webpack_require__(192).Grid,
-	    DragTarget = __webpack_require__(430).DropTarget;
+	    DragTarget = __webpack_require__(430).DropTarget,
+	    Label = __webpack_require__(192).Label,
+	    Actions = __webpack_require__(189);
 
 
 	var Type = {
-	    Button:"button"
+	    Button: "button"
 	};
 
 	var boxTarget = {
-	    drop:function(props,monitor,components){
-	        console.log(monitor.didDrop());
-	        var hasChild = monitor.didDrop();
-	        props.onDrop(monitor.getItem());
-	        components.setState({
-	            hasDropped:true,
-	            hasDroppedOnChild:hasChild
-	        })
+	    drop: function (props, monitor, components) {
+	        Actions.boxTargetDrop(props, monitor, components);
 	    }
 	};
 
-	function collect(connect,monitor){
+	function collect(connect, monitor) {
 	    return {
-	        child:monitor.getItem(),
-	        connectDropTarget:connect.dropTarget(),
-	        isOver:monitor.isOver(),
-	        isOverCurrent:monitor.isOver({
-	            shallow:true
-	        })
+	        child: monitor.getItem() || monitor.getDropResult(),
+	        connectDropTarget: connect.dropTarget(),
+	        isOver: monitor.isOver()
 	    }
 	}
 
 
 	var MainDisplayBox = React.createClass({displayName: "MainDisplayBox",
 
-	    propTypes:{
+	    propTypes: {
 	        connectDropTarget: PropTypes.func.isRequired,
 	        isOver: PropTypes.bool.isRequired,
-	        isOverCurrent: PropTypes.bool.isRequired,
 	        greedy: PropTypes.bool,
 	        children: PropTypes.node
 	    },
+	    componentWillMount: function () {
 
+	    },
+	    shouldComponentUpdate: function (nextProps, nextState) {
+	        return !this.props.child;
+	    },
 	    render: function () {
 	        var children = this.props.child,
 	            connectTarget = this.props.connectDropTarget;
-	        console.log(this.props);
+	        var Component = children && children.name ? eval(children.name) : Label;
 	        return connectTarget(
 	            React.createElement("div", null, 
-	                
-	                    (children&&children.name)?
-	                    '<'+children.name+'>'+'</'+ children.name+'>' :"null"
+	                children && children.name ?
+	                    React.createElement(Component, null, children.name) : null
 	                
 	            )
 	        );
 	    }
 	});
 
-	module.exports = DragTarget(Type.Button,boxTarget,collect)(MainDisplayBox);
+	module.exports = DragTarget(Type.Button, boxTarget, collect)(MainDisplayBox);
 
 /***/ },
 /* 192 */
@@ -42207,7 +42179,8 @@
 	    PropTypes = React.PropTypes,
 	    ItemType = __webpack_require__(508).ItemType,
 	    DragSource = __webpack_require__(430).DragSource,
-	    Button = __webpack_require__(192).Button;
+	    Button = __webpack_require__(192).Button,
+	    Actions = __webpack_require__(189);
 
 	var buttonSource = {
 	    beginDrag: function beginDrag(props) {
@@ -42216,7 +42189,6 @@
 	        };
 	    },
 	    endDrag: function endDrag(props, monitor) {
-	        console.log('do it');
 	        var result = monitor.getDropResult(),
 	            item = monitor.getItem();
 	        return {
@@ -44965,6 +44937,53 @@
 	}
 
 	module.exports = exports['default'];
+
+/***/ },
+/* 564 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(12),
+	    ReactDom = __webpack_require__(168),
+	    Accordion = __webpack_require__(192).Accordion,
+	    Panel = __webpack_require__(192).Panel,
+	    ListGroup = __webpack_require__(192).ListGroup,
+	    ListGroupItem = __webpack_require__(192).ListGroupItem,
+	    Button = __webpack_require__(507);
+
+	var LeftMenu = React.createClass({displayName: "LeftMenu",
+
+	    render: function () {
+	        return (
+	            React.createElement(Accordion, null, 
+	                React.createElement(Panel, {header: "Collapsible Group Item #1", eventKey: "1"}, 
+	                    React.createElement(ListGroup, null, 
+	                        React.createElement(ListGroupItem, null, 
+	                            React.createElement(Button, {name: "Label"}, 
+	                                "this is a button;"
+	                            )
+	                        )
+	                    )
+	                ), 
+	                React.createElement(Panel, {header: "Collapsible Group Item #2", eventKey: "2"}, 
+	                    React.createElement(ListGroup, null, 
+	                        React.createElement(ListGroupItem, null, 
+	                            "this is a button"
+	                        )
+	                    )
+	                ), 
+	                React.createElement(Panel, {header: "Collapsible Group Item #3", eventKey: "3"}, 
+	                    React.createElement(ListGroup, null, 
+	                        React.createElement(ListGroupItem, null, 
+	                            "this is a button"
+	                        )
+	                    )
+	                )
+	            )
+	        )
+	    }
+	});
+
+	module.exports = LeftMenu;
 
 /***/ }
 /******/ ]);

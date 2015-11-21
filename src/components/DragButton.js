@@ -2,17 +2,17 @@ var React = require('react'),
     PropTypes = React.PropTypes,
     ItemType = require('./contants').ItemType,
     DragSource = require('react-dnd').DragSource,
-    Button = require('react-bootstrap').Button;
+    Button = require('react-bootstrap').Button,
+    Actions = require('../action/actions');
 
 
 var buttonSource = {
     beginDrag: function (props) {
         return {
-            name: props.name
+            name:props.name
         }
     },
     endDrag: function (props,monitor) {
-        console.log('do it');
         var result = monitor.getDropResult(),
             item = monitor.getItem();
         return {
